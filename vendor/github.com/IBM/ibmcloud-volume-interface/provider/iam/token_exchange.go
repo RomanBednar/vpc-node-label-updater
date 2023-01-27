@@ -31,6 +31,7 @@ import (
 	"github.com/IBM/ibmcloud-volume-interface/config"
 	util "github.com/IBM/ibmcloud-volume-interface/lib/utils"
 	"github.com/IBM/secret-common-lib/pkg/secret_provider"
+	"github.com/IBM/secret-utils-lib/pkg/k8s_utils"
 	sp "github.com/IBM/secret-utils-lib/pkg/secret_provider"
 )
 
@@ -45,8 +46,9 @@ const (
 
 // tokenExchangeService ...
 type tokenExchangeService struct {
-	authConfig *AuthConfiguration
-	httpClient *http.Client
+	authConfig     *AuthConfiguration
+	httpClient     *http.Client
+	secretprovider sp.SecretProviderInterface
 }
 
 // AuthConfiguration ...
@@ -54,7 +56,6 @@ type AuthConfiguration struct {
 	IamURL          string
 	IamClientID     string
 	IamClientSecret string
-	Secretprovider  sp.SecretProviderInterface
 }
 
 // TokenExchangeService ...
@@ -69,15 +70,28 @@ func NewTokenExchangeServiceWithClient(authConfig *AuthConfiguration, httpClient
 }
 
 // NewTokenExchangeService ...
-func NewTokenExchangeService(authConfig *AuthConfiguration, providerType ...string) (TokenExchangeService, error) {
+func NewTokenExchangeService(authConfig *AuthConfiguration, k8sClient *k8s_utils.KubernetesClient, providerType ...string) (TokenExchangeService, error) {
 	httpClient, err := config.GeneralCAHttpClient()
 	if err != nil {
 		return nil, err
 	}
 
+	providerTypeArg := make(map[string]string)
+	if len(providerType) != 0 {
+		providerTypeArg[secret_provider.ProviderType] = providerType[0]
+	} else {
+		providerTypeArg[secret_provider.ProviderType] = VPC
+	}
+
+	spObject, err := secret_provider.NewSecretProvider(k8sClient, providerTypeArg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &tokenExchangeService{
-		authConfig: authConfig,
-		httpClient: httpClient,
+		authConfig:     authConfig,
+		httpClient:     httpClient,
+		secretprovider: spObject,
 	}, nil
 }
 
@@ -132,7 +146,7 @@ func (tes *tokenExchangeService) ExchangeIAMAPIKeyForIMSToken(iamAPIKey string, 
 // ExchangeIAMAPIKeyForAccessToken ...
 func (tes *tokenExchangeService) ExchangeIAMAPIKeyForAccessToken(iamAPIKey string, logger *zap.Logger) (*AccessToken, error) {
 	logger.Info("Fetching using secret provider")
-	token, _, err := tes.authConfig.Secretprovider.GetDefaultIAMToken(false)
+	token, _, err := tes.secretprovider.GetDefaultIAMToken(false)
 	if err != nil {
 		logger.Error("Error fetching iam token", zap.Error(err))
 		return nil, err

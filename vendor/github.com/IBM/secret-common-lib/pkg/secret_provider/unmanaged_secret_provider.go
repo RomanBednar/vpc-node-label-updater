@@ -45,10 +45,18 @@ type UnmanagedSecretProvider struct {
 }
 
 // newUnmanagedSecretProvider ...
-func newUnmanagedSecretProvider(logger *zap.Logger, optionalArgs ...map[string]string) (*UnmanagedSecretProvider, error) {
-	kc, err := k8s_utils.Getk8sClientSet(logger)
+func newUnmanagedSecretProvider(k8sClient *k8s_utils.KubernetesClient, logger *zap.Logger, optionalArgs ...map[string]string) (*UnmanagedSecretProvider, error) {
+	// Validate the argument k8s client
+	err := k8s_utils.ValidateK8SClient(k8sClient)
+	if err == nil {
+		return InitUnmanagedSecretProvider(logger, *k8sClient, optionalArgs...)
+	}
+
+	// If the k8s client passed as argument is nil or is invalid, fetch k8s client internally.
+	logger.Error("Provided k8s client is invalid", zap.Error(err))
+	kc, err := k8s_utils.Getk8sClientSet()
 	if err != nil {
-		logger.Info("Error fetching k8s client set", zap.Error(err))
+		logger.Error("Error fetching k8s client set", zap.Error(err))
 		return nil, err
 	}
 	return InitUnmanagedSecretProvider(logger, kc, optionalArgs...)

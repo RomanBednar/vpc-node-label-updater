@@ -25,6 +25,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/IBM/secret-utils-lib/pkg/k8s_utils"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -54,12 +55,18 @@ func TestReadSecretConfiguration(t *testing.T) {
 	logger, teardown := GetTestLogger(t)
 	defer teardown()
 
-	if err != nil {
-		t.Errorf("This test will fail because of %v", err)
-	}
-
-	_, err = ReadSecretConfiguration(logger)
+	// Passing nil k8s client
+	_, err := ReadSecretConfiguration(nil, logger)
 	assert.NotNil(t, err)
+
+	// Passing valid k8s client
+	k8sClient, _ := k8s_utils.FakeGetk8sClientSet()
+	pwd, _ := os.Getwd()
+	file := filepath.Join(pwd, "..", "..", "test-fixtures", "slclient.toml")
+	err = k8s_utils.FakeCreateSecret(k8sClient, "DEFAULT", file)
+	_, err = ReadSecretConfiguration(&k8sClient, logger)
+	assert.NotNil(t, err)
+
 }
 
 type testConfig struct {

@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/IBM/secret-utils-lib/pkg/k8s_utils"
 	nodeupdater "github.com/IBM/vpc-node-label-updater/pkg/nodeupdater"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -106,7 +107,7 @@ func GetClientset(ctxLogger *zap.Logger) (*kubernetes.Clientset, error) {
 
 func main() {
 	logger.Info("Starting controller for adding node labels")
-	k8sClientset, err := GetClientset(logger)
+	k8sClient, err := k8s_utils.Getk8sClientSet()
 	if err != nil {
 		logger.Fatal("Failed to kubernetes create client set", zap.Error(err))
 	}
@@ -116,7 +117,7 @@ func main() {
 	logger.Info("Getting node details")
 	var node *v1.Node
 	errRetry := nodeupdater.ErrorRetry(logger, func() (error, bool) {
-		node, err = k8sClientset.CoreV1().Nodes().Get(context.TODO(), nodeName, metav1.GetOptions{})
+		node, err = k8sClient.Clientset.CoreV1().Nodes().Get(context.TODO(), nodeName, metav1.GetOptions{})
 		if errors.IsNotFound(err) {
 			runtimeu.HandleError(fmt.Errorf("node '%s' no longer exist in the cluster", nodeName))
 			return err, true // Skip retry if node doesnot exist.
@@ -136,12 +137,12 @@ func main() {
 	}
 
 	var secretConfig *nodeupdater.StorageSecretConfig
-	if secretConfig, err = nodeupdater.ReadSecretConfiguration(logger); err != nil {
+	if secretConfig, err = nodeupdater.ReadSecretConfiguration(&k8sClient, logger); err != nil {
 		logger.Fatal("Failed to read secret configuration", zap.Error(err))
 	}
 	c := &nodeupdater.VpcNodeLabelUpdater{
 		Node:                node,
-		K8sClient:           k8sClientset,
+		K8sClient:           k8sClient.Clientset,
 		Logger:              logger,
 		StorageSecretConfig: secretConfig,
 	}

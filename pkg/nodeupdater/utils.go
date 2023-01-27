@@ -30,6 +30,7 @@ import (
 
 	"github.com/IBM/ibmcloud-volume-interface/provider/iam"
 	sp "github.com/IBM/secret-common-lib/pkg/secret_provider"
+	"github.com/IBM/secret-utils-lib/pkg/k8s_utils"
 	"go.uber.org/zap"
 )
 
@@ -49,12 +50,12 @@ const (
 )
 
 // ReadSecretConfiguration ...
-func ReadSecretConfiguration(ctxLogger *zap.Logger) (*StorageSecretConfig, error) {
+func ReadSecretConfiguration(k8sClient *k8s_utils.KubernetesClient, ctxLogger *zap.Logger) (*StorageSecretConfig, error) {
 	ctxLogger.Info("Fetching secret configuration.")
 	providerType := map[string]string{
 		sp.ProviderType: sp.VPC,
 	}
-	spObject, err := sp.NewSecretProvider(providerType)
+	spObject, err := sp.NewSecretProvider(k8sClient, providerType)
 	if err != nil {
 		ctxLogger.Error("Error initializing secret provider", zap.Error(err))
 		return nil, err
