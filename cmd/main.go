@@ -22,7 +22,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/IBM/secret-utils-lib/pkg/k8s_utils"
 	nodeupdater "github.com/IBM/vpc-node-label-updater/pkg/nodeupdater"
@@ -32,9 +31,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtimeu "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (
@@ -64,45 +60,6 @@ func setUpLogger() *zap.Logger {
 
 	atom.SetLevel(zap.InfoLevel)
 	return logger
-}
-
-// GetClientConfig first tries to get a config object which uses the service account kubernetes gives to pods,
-// if it is called from a process running in a kubernetes environment.
-// Otherwise, it tries to build config from a default kubeconfig filepath if it fails, it fallback to the default config.
-// Once it get the config, it returns the same.
-func GetClientConfig(ctxLogger *zap.Logger) (*rest.Config, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		ctxLogger.Error("Failed to create config. Error", zap.Error(err))
-		err1 := err
-		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-		if err != nil {
-			err = fmt.Errorf("inClusterConfig as well as BuildConfigFromFlags Failed. Error in InClusterConfig: %+v\nError in BuildConfigFromFlags: %+v", err1, err)
-			return nil, err
-		}
-	}
-
-	return config, nil
-}
-
-// GetClientset first tries to get a config object which uses the service account kubernetes gives to pods,
-// if it is called from a process running in a kubernetes environment.
-// Otherwise, it tries to build config from a default kubeconfig filepath if it fails, it fallback to the default config.
-// Once it get the config, it creates a new Clientset for the given config and returns the clientset.
-func GetClientset(ctxLogger *zap.Logger) (*kubernetes.Clientset, error) {
-	config, err := GetClientConfig(ctxLogger)
-	if err != nil {
-		return nil, err
-	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		err = fmt.Errorf("failed creating kubernetes clientset. Error: %+v", err)
-		return nil, err
-	}
-
-	return clientset, nil
 }
 
 func main() {

@@ -3,8 +3,9 @@ module github.com/IBM/vpc-node-label-updater
 go 1.18
 
 require (
-	github.com/IBM/ibmcloud-volume-interface v1.1.2-0.20230126215232-644f32546a1c
-	github.com/IBM/secret-common-lib v1.1.2-0.20230126210227-804d495635b6
+	github.com/IBM/ibmcloud-volume-interface v1.1.2-0.20230129233420-af776646ee5b
+	github.com/IBM/secret-common-lib v1.1.2-0.20230129233028-e0a78d7feebe
+	github.com/IBM/secret-utils-lib v1.1.2-0.20230129232900-2c013a1ff593
 	github.com/stretchr/testify v1.8.0
 	go.uber.org/zap v1.20.0
 	k8s.io/api v0.25.4
@@ -16,7 +17,6 @@ require (
 	github.com/BurntSushi/toml v1.0.0 // indirect
 	github.com/IBM-Cloud/ibm-cloud-cli-sdk v0.6.7 // indirect
 	github.com/IBM/go-sdk-core/v5 v5.9.1 // indirect
-	github.com/IBM/secret-utils-lib v1.1.2-0.20230126205657-f30b56d8a191 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef // indirect
@@ -41,7 +41,6 @@ require (
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.0 // indirect
-	github.com/imdario/mergo v0.3.6 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
@@ -54,7 +53,6 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	go.mongodb.org/mongo-driver v1.7.5 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
