@@ -8,18 +8,18 @@ github.com/IBM-Cloud/ibm-cloud-cli-sdk/common/rest
 # github.com/IBM/go-sdk-core/v5 v5.9.1
 ## explicit; go 1.14
 github.com/IBM/go-sdk-core/v5/core
-# github.com/IBM/ibmcloud-volume-interface v1.1.2-0.20230129233420-af776646ee5b
+# github.com/IBM/ibmcloud-volume-interface v1.1.2
 ## explicit; go 1.18
 github.com/IBM/ibmcloud-volume-interface/config
 github.com/IBM/ibmcloud-volume-interface/lib/provider
 github.com/IBM/ibmcloud-volume-interface/lib/utils
 github.com/IBM/ibmcloud-volume-interface/lib/utils/reasoncode
 github.com/IBM/ibmcloud-volume-interface/provider/iam
-# github.com/IBM/secret-common-lib v1.1.2-0.20230129233028-e0a78d7feebe
+# github.com/IBM/secret-common-lib v1.1.2
 ## explicit; go 1.18
 github.com/IBM/secret-common-lib/pkg/secret_provider
 github.com/IBM/secret-common-lib/pkg/utils
-# github.com/IBM/secret-utils-lib v1.1.2-0.20230129232900-2c013a1ff593
+# github.com/IBM/secret-utils-lib v1.1.2
 ## explicit; go 1.18
 github.com/IBM/secret-utils-lib/pkg/authenticator
 github.com/IBM/secret-utils-lib/pkg/config
