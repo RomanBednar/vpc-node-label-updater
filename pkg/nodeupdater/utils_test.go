@@ -55,18 +55,23 @@ func TestReadSecretConfiguration(t *testing.T) {
 	logger, teardown := GetTestLogger(t)
 	defer teardown()
 
-	// Passing nil k8s client
-	_, err := ReadSecretConfiguration(nil, logger)
+	k8sClient, _ := k8s_utils.FakeGetk8sClientSet()
+	// Passing k8s client without any secret created ...
+	_, err := ReadSecretConfiguration(&k8sClient, logger)
 	assert.NotNil(t, err)
 
-	// Passing valid k8s client
-	k8sClient, _ := k8s_utils.FakeGetk8sClientSet()
+	// Passing valid k8s client, GetDefaultIAMToken fails, as expected.
 	pwd, _ := os.Getwd()
 	file := filepath.Join(pwd, "..", "..", "test-fixtures", "slclient.toml")
 	err = k8s_utils.FakeCreateSecret(k8sClient, "DEFAULT", file)
 	_, err = ReadSecretConfiguration(&k8sClient, logger)
 	assert.NotNil(t, err)
 
+	// RIAAS URL not provided in config
+	file = filepath.Join(pwd, "..", "..", "test-fixtures", "invalid-slclient.toml")
+	err = k8s_utils.FakeCreateSecret(k8sClient, "DEFAULT", file)
+	_, err = ReadSecretConfiguration(&k8sClient, logger)
+	assert.NotNil(t, err)
 }
 
 type testConfig struct {
