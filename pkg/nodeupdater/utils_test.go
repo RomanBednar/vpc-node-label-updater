@@ -63,37 +63,15 @@ func TestReadSecretConfiguration(t *testing.T) {
 	// Passing valid k8s client, GetDefaultIAMToken fails, as expected.
 	pwd, _ := os.Getwd()
 	file := filepath.Join(pwd, "..", "..", "test-fixtures", "slclient.toml")
-	err = k8s_utils.FakeCreateSecret(k8sClient, "DEFAULT", file)
+	_ = k8s_utils.FakeCreateSecret(k8sClient, "DEFAULT", file)
 	_, err = ReadSecretConfiguration(&k8sClient, logger)
 	assert.NotNil(t, err)
 
 	// RIAAS URL not provided in config
 	file = filepath.Join(pwd, "..", "..", "test-fixtures", "invalid-slclient.toml")
-	err = k8s_utils.FakeCreateSecret(k8sClient, "DEFAULT", file)
+	_ = k8s_utils.FakeCreateSecret(k8sClient, "DEFAULT", file)
 	_, err = ReadSecretConfiguration(&k8sClient, logger)
 	assert.NotNil(t, err)
-}
-
-type testConfig struct {
-	Header sectionTestConfig
-}
-
-type sectionTestConfig struct {
-	ID      int
-	Name    string
-	YesOrNo bool
-	Pi      float64
-	List    string
-}
-
-var testConf = testConfig{
-	Header: sectionTestConfig{
-		ID:      1,
-		Name:    "test",
-		YesOrNo: true,
-		Pi:      3.14,
-		List:    "1, 2",
-	},
 }
 
 func TestCheckIfRequiredLabelsPresent(t *testing.T) {
