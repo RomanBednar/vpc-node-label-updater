@@ -48,9 +48,9 @@ func (c *VpcNodeLabelUpdater) UpdateNodeLabel(ctx context.Context, workerNodeNam
 	c.Node.ObjectMeta.Labels[workerIDLabelKey] = nodeinfo.InstanceID
 	c.Node.ObjectMeta.Labels[instanceIDLabelKey] = nodeinfo.InstanceID
 	c.Node.ObjectMeta.Labels[failureRegionLabelKey] = nodeinfo.Region
-	c.Node.ObjectMeta.Labels[failureZoneLabelKey] = nodeinfo.Zone
+	//c.Node.ObjectMeta.Labels[failureZoneLabelKey] = nodeinfo.Zone
 	c.Node.ObjectMeta.Labels[topologyRegionLabelKey] = nodeinfo.Region
-	c.Node.ObjectMeta.Labels[topologyZoneLabelKey] = nodeinfo.Zone
+	//c.Node.ObjectMeta.Labels[topologyZoneLabelKey] = nodeinfo.Zone
 	c.Node.ObjectMeta.Labels[vpcBlockLabelKey] = "true"
 
 	_, err = c.K8sClient.CoreV1().Nodes().Update(ctx, c.Node, metav1.UpdateOptions{})
